@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ProductManagement.BLL.Services;
 using ProductManagement.BLL.DTOs;
+using ProductManagement.BLL.Interfaces;
 
 namespace ProductManagement.WebApi.Controllers
 {
@@ -9,11 +9,13 @@ namespace ProductManagement.WebApi.Controllers
     public class SubCategoriesController : ControllerBase
     {
         private readonly ILogger _logger;
-        private readonly IGenericService<SubCategoryDTO> _subCategoryService;
-        public SubCategoriesController(ILogger<SubCategoriesController> logger, IGenericService<SubCategoryDTO> subCategoryService)
+        private readonly ISubCategoryService _subCategoryService;
+        private readonly ICategoryService _categoryService;
+        public SubCategoriesController(ILogger<SubCategoriesController> logger, ISubCategoryService subCategoryService, ICategoryService categoryService)
         {
             _logger = logger;
             _subCategoryService = subCategoryService;
+            _categoryService = categoryService;
         }
 
         [HttpGet]
@@ -21,7 +23,7 @@ namespace ProductManagement.WebApi.Controllers
         {
             try
             {
-                var subCategories = await _subCategoryService.GetAllAsync();
+                var subCategories = await _subCategoryService.GetAllSubCategoriesAsync();
                 if (subCategories == null)
                 {
                     return NotFound("Not any subCategories found!");
@@ -61,7 +63,7 @@ namespace ProductManagement.WebApi.Controllers
         {
             try
             {
-                var subCategory = await _subCategoryService.GetByIdAsync(id);
+                var subCategory = await _subCategoryService.GetSubCategoryByIdAsync(id);
                 if (subCategory == null)
                 {
                     return NotFound($"SubCategory with id: {id} not found!");
@@ -83,9 +85,14 @@ namespace ProductManagement.WebApi.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (!await _categoryService.IsValidCategoryID(toBeCreatedSubCategory.CategoryID))
+            {
+                return NotFound($"Category ID: {toBeCreatedSubCategory.CategoryID} not found in categories!");
+            }
+
             try
             {
-                var createdSubCategory = await _subCategoryService.CreateAsync(toBeCreatedSubCategory);
+                var createdSubCategory = await _subCategoryService.CreateSubCategoryAsync(toBeCreatedSubCategory);
                 return CreatedAtAction(nameof(GetById), new { id = createdSubCategory.ID }, createdSubCategory);
             }
             catch (Exception e)
@@ -108,9 +115,14 @@ namespace ProductManagement.WebApi.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (!await _categoryService.IsValidCategoryID(toBeUpdatedSubCategory.CategoryID))
+            {
+                return NotFound($"Category ID: {toBeUpdatedSubCategory.CategoryID} not found in categories!");
+            }
+
             try
             {
-                var updatedSubCategory = await _subCategoryService.UpdateAsync(toBeUpdatedSubCategory);
+                var updatedSubCategory = await _subCategoryService.UpdateSubCategoryAsync(toBeUpdatedSubCategory);
                 return Ok(updatedSubCategory);
             }
             catch (Exception e)
@@ -125,12 +137,12 @@ namespace ProductManagement.WebApi.Controllers
         {
             try
             {
-                var toBeDeletedSubCategory = await _subCategoryService.GetByIdAsync(id);
+                var toBeDeletedSubCategory = await _subCategoryService.GetSubCategoryByIdAsync(id);
                 if (toBeDeletedSubCategory == null)
                 {
                     return NotFound($"SubCategory with id: {id} could not found!");
                 }
-                var deletedSubCategory = await _subCategoryService.DeleteAsync(toBeDeletedSubCategory);
+                var deletedSubCategory = await _subCategoryService.DeleteSubCategoryAsync(toBeDeletedSubCategory);
                 return Ok(deletedSubCategory);
             }
             catch (Exception e)

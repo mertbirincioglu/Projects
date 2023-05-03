@@ -2,12 +2,7 @@
 using ProductManagement.DAL.Data;
 using ProductManagement.DAL.Entities;
 using ProductManagement.DAL.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProductManagement.DAL.Repositories
 {

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using ProductManagement.BLL.DTOs;
 using ProductManagement.DAL.Entities;
 
 namespace ProductManagement.BLL.DTOs

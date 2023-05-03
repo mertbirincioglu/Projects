@@ -2,17 +2,11 @@
 using ProductManagement.BLL.DTOs;
 using ProductManagement.DAL.Interfaces;
 using ProductManagement.DAL.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ProductManagement.DAL.Repositories;
-using System.Linq.Expressions;
+using ProductManagement.BLL.Interfaces;
 
 namespace ProductManagement.BLL.Services
 {
-    public  class SubCategoryService : IGenericService<SubCategoryDTO>
+    public  class SubCategoryService : ISubCategoryService
     {
         private readonly ISubCategoryRepository _subCategoryRepository;
         private readonly IMapper _mapper;
@@ -23,19 +17,19 @@ namespace ProductManagement.BLL.Services
             _mapper = mapper;
         }
 
-        public async Task<SubCategoryDTO> CreateAsync(SubCategoryDTO toBeCreatedSubCategory)
+        public async Task<SubCategoryDTO> CreateSubCategoryAsync(SubCategoryDTO toBeCreatedSubCategory)
         {
             var createdSubCategory = _mapper.Map<SubCategory, SubCategoryDTO>(await _subCategoryRepository.CreateSubCategoryAsync(_mapper.Map<SubCategoryDTO, SubCategory>(toBeCreatedSubCategory)));
             return createdSubCategory;
         }
 
-        public async Task<SubCategoryDTO> DeleteAsync(SubCategoryDTO toBeDeletedSubCategory)
+        public async Task<SubCategoryDTO> DeleteSubCategoryAsync(SubCategoryDTO toBeDeletedSubCategory)
         {
             var deletedSubCategory = _mapper.Map<SubCategory, SubCategoryDTO>(await _subCategoryRepository.DeleteSubCategoryAsync(_mapper.Map<SubCategoryDTO, SubCategory>(toBeDeletedSubCategory)));
             return deletedSubCategory;
         }
 
-        public async Task<IList<SubCategoryDTO>> GetAllAsync()
+        public async Task<IList<SubCategoryDTO>> GetAllSubCategoriesAsync()
         {
             var subCategories = _mapper.Map<IList<SubCategory>, IList<SubCategoryDTO>>(await _subCategoryRepository.GetAllSubCategoriesAsync());
             return subCategories;
@@ -47,16 +41,22 @@ namespace ProductManagement.BLL.Services
         //    return subCategories;
         //}
 
-        public async Task<SubCategoryDTO> GetByIdAsync(int id)
+        public async Task<SubCategoryDTO> GetSubCategoryByIdAsync(int id)
         {
             var subCategory = _mapper.Map<SubCategory, SubCategoryDTO>(await _subCategoryRepository.GetSubCategoryByIdAsync(id));
             return subCategory;
         }
 
-        public async Task<SubCategoryDTO> UpdateAsync(SubCategoryDTO toBeUpdatedSubCategory)
+        public async Task<SubCategoryDTO> UpdateSubCategoryAsync(SubCategoryDTO toBeUpdatedSubCategory)
         {
             var updatedSubCategory = _mapper.Map<SubCategory, SubCategoryDTO>(await _subCategoryRepository.UpdateSubCategoryAsync(_mapper.Map<SubCategoryDTO, SubCategory>(toBeUpdatedSubCategory)));
             return updatedSubCategory;
+        }
+
+        public async Task<bool> IsValidSubCategoryID(int id)
+        {
+            var subCategories = await this.GetAllSubCategoriesAsync();
+            return subCategories.Select(sc => sc.ID).Contains(id);
         }
     }
 }

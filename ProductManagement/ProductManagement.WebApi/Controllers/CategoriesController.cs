@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ProductManagement.BLL.Services;
 using ProductManagement.BLL.DTOs;
+using ProductManagement.BLL.Interfaces;
 
 namespace ProductManagement.WebApi.Controllers
 {
@@ -9,8 +9,8 @@ namespace ProductManagement.WebApi.Controllers
     public class CategoriesController : ControllerBase
     {
         private readonly ILogger _logger;
-        private readonly IGenericService<CategoryDTO> _categoryService;
-        public CategoriesController(ILogger<CategoriesController> logger, IGenericService<CategoryDTO> categoryService)
+        private readonly ICategoryService _categoryService;
+        public CategoriesController(ILogger<CategoriesController> logger, ICategoryService categoryService)
         {
             _logger = logger;
             _categoryService = categoryService;
@@ -21,7 +21,7 @@ namespace ProductManagement.WebApi.Controllers
         {
             try
             {
-                var categories = await _categoryService.GetAllAsync();
+                var categories = await _categoryService.GetAllCategoriesAsync();
                 if (categories == null)
                 {
                     return NotFound("Not any categories found!");
@@ -61,7 +61,7 @@ namespace ProductManagement.WebApi.Controllers
         {
             try
             {
-                var category = await _categoryService.GetByIdAsync(id);
+                var category = await _categoryService.GetCategoryByIdAsync(id);
                 if (category == null)
                 {
                     return NotFound($"Category with id: {id} not found!");
@@ -85,7 +85,7 @@ namespace ProductManagement.WebApi.Controllers
 
             try
             {
-                var createdCategory = await _categoryService.CreateAsync(toBeCreatedCategory);
+                var createdCategory = await _categoryService.CreateCategoryAsync(toBeCreatedCategory);
                 return CreatedAtAction(nameof(GetById), new { id = createdCategory.ID }, createdCategory);
             }
             catch (Exception e)
@@ -110,7 +110,7 @@ namespace ProductManagement.WebApi.Controllers
 
             try
             {
-                var updatedCategory = await _categoryService.UpdateAsync(toBeUpdatedCategory);
+                var updatedCategory = await _categoryService.UpdateCategoryAsync(toBeUpdatedCategory);
                 return Ok(updatedCategory);
             }
             catch (Exception e)
@@ -125,12 +125,12 @@ namespace ProductManagement.WebApi.Controllers
         {
             try
             {
-                var toBeDeletedCategory = await _categoryService.GetByIdAsync(id);
+                var toBeDeletedCategory = await _categoryService.GetCategoryByIdAsync(id);
                 if (toBeDeletedCategory == null)
                 {
                     return NotFound($"Category with id: {id} could not found!");
                 }
-                var deletedCategory = await _categoryService.DeleteAsync(toBeDeletedCategory);
+                var deletedCategory = await _categoryService.DeleteCategoryAsync(toBeDeletedCategory);
                 return Ok(deletedCategory);
             }
             catch (Exception e)

@@ -2,17 +2,11 @@
 using ProductManagement.BLL.DTOs;
 using ProductManagement.DAL.Interfaces;
 using ProductManagement.DAL.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ProductManagement.DAL.Repositories;
-using System.Linq.Expressions;
+using ProductManagement.BLL.Interfaces;
 
 namespace ProductManagement.BLL.Services
 {
-    public class CategoryService : IGenericService<CategoryDTO> 
+    public class CategoryService : ICategoryService
     {
         private  readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
@@ -23,19 +17,19 @@ namespace ProductManagement.BLL.Services
             _mapper = mapper;
         }
 
-        public async Task<CategoryDTO> CreateAsync(CategoryDTO toBeCreatedCategory)
+        public async Task<CategoryDTO> CreateCategoryAsync(CategoryDTO toBeCreatedCategory)
         {
             var createdCategory = _mapper.Map<Category, CategoryDTO>(await _categoryRepository.CreateCategoryAsync(_mapper.Map<CategoryDTO, Category>(toBeCreatedCategory)));
             return createdCategory;
         }
 
-        public async Task<CategoryDTO> DeleteAsync(CategoryDTO toBeDeletedCategory)
+        public async Task<CategoryDTO> DeleteCategoryAsync(CategoryDTO toBeDeletedCategory)
         {
             var deletedCategory = _mapper.Map<Category, CategoryDTO>(await _categoryRepository.DeleteCategoryAsync(_mapper.Map<CategoryDTO, Category>(toBeDeletedCategory)));
             return deletedCategory;
         }
 
-        public async Task<IList<CategoryDTO>> GetAllAsync()
+        public async Task<IList<CategoryDTO>> GetAllCategoriesAsync()
         {
             var categories = _mapper.Map<IList<Category>, IList<CategoryDTO>>(await _categoryRepository.GetAllCategoriesAsync());
             return categories;
@@ -47,16 +41,22 @@ namespace ProductManagement.BLL.Services
         //    return categories;
         //}
 
-        public async Task<CategoryDTO> GetByIdAsync(int id)
+        public async Task<CategoryDTO> GetCategoryByIdAsync(int id)
         {
             var category = _mapper.Map<Category, CategoryDTO>(await _categoryRepository.GetCategoryByIdAsync(id));
             return category;
         }
 
-        public async Task<CategoryDTO> UpdateAsync(CategoryDTO toBeUpdatedCategory)
+        public async Task<CategoryDTO> UpdateCategoryAsync(CategoryDTO toBeUpdatedCategory)
         {
             var updatedCategory = _mapper.Map<Category, CategoryDTO>(await _categoryRepository.UpdateCategoryAsync(_mapper.Map<CategoryDTO, Category>(toBeUpdatedCategory)));
             return updatedCategory;
+        }
+
+        public async Task<bool> IsValidCategoryID(int id)
+        {
+            var categories = await this.GetAllCategoriesAsync();
+            return categories.Select(c => c.ID).Contains(id);
         }
     }
 }

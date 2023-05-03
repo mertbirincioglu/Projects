@@ -5,6 +5,8 @@ using ProductManagement.DAL.Data;
 using AutoMapper;
 using ProductManagement.DAL.Interfaces;
 using ProductManagement.DAL.Repositories;
+using ProductManagement.BLL.Interfaces;
+using ProductManagement.WebApi.RabbitMQ;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -17,11 +19,13 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
 // Service configurations
-builder.Services.AddScoped<IGenericService<ProductDTO>, ProductService>();
-builder.Services.AddScoped<IGenericService<CategoryDTO>, CategoryService>();
-builder.Services.AddScoped<IGenericService<SubCategoryDTO>, SubCategoryService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ISubCategoryService, SubCategoryService>();
 // Mapper configuration
 builder.Services.AddAutoMapper(System.Reflection.Assembly.GetAssembly(typeof(ProductProfile)));
+//RabbitMQ configuration
+builder.Services.AddScoped<IRabbitMQProducer, RabbitMQProducer>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
